@@ -19,7 +19,7 @@ WITH last_data_pcr AS (
   LAG(total::integer,6) OVER (ORDER BY fecha::date) total_6,
   LAG(total::integer,7) OVER (ORDER BY fecha::date) total_7
   FROM datadista_ccaa_covid19_confirmados_pcr_long
-  where ccaa='#{autonomy}'
+  where ccaa ilike '#{autonomy}'
   order by fecha::date DESC
   LIMIT 7
 )

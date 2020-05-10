@@ -6,11 +6,11 @@ require_relative './utils'
 include ActiveSupport::NumberHelper
 
 data = Utils.run_query(Utils.query_places)
-valid_locations = data.map{|h| h['ccaa']}
+valid_locations = data.map{|h| h['ccaa'].downcase }
 
 Telegram::Bot::Client.run(ENV['TOKEN'], logger: Logger.new($stderr)) do |bot|
   bot.listen do |message|
-    text = message.text.strip
+    text = message.text.try(:strip).try(:downcase)
     if text =~ /\Adatos/
       if m = text.match(/\Adatos\s(.+)\z/)
         autonomy = m[1].try(:strip)
@@ -32,7 +32,7 @@ Telegram::Bot::Client.run(ENV['TOKEN'], logger: Logger.new($stderr)) do |bot|
       bot.api.send_message(chat_id: message.chat.id, text: Utils.about_message)
     else
       bot.api.send_message(chat_id: message.chat.id, text: "Comandos:")
-      bot.api.send_message(chat_id: message.chat.id, text: "- datos <Autonomia>, donde autonomía es uno de estos valores: #{valid_locations.join(', ')}")
+      bot.api.send_message(chat_id: message.chat.id, text: "- datos <Autonomía>, donde autonomía es uno de estos valores: #{valid_locations.join(', ')}")
       bot.api.send_message(chat_id: message.chat.id, text: "- comunidades o autonomías, para obtener un listado de valores")
       bot.api.send_message(chat_id: message.chat.id, text: "- acercade, para saber más sobre el bot y los datos")
     end
